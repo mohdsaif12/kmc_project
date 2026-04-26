@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabase";
 export default function ActivitiesPage() {
   const [activeTab, setActiveTab] = useState("organized");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // State for Organized
   const [organizedEntries, setOrganizedEntries] = useState<any[]>([]);
@@ -21,14 +22,24 @@ export default function ActivitiesPage() {
 
   const fetchData = async () => {
     setLoading(true);
-    const { data: organized } = await supabase.from('activities_organized').select('*').order('created_at', { ascending: false });
-    const { data: attended } = await supabase.from('activities_attended').select('*').order('created_at', { ascending: false });
-    const { data: support } = await supabase.from('student_support_activities').select('*').order('created_at', { ascending: false });
-    
-    if (organized) setOrganizedEntries(organized);
-    if (attended) setAttendedEntries(attended);
-    if (support) setSupportEntries(support);
-    setLoading(false);
+    setError(null);
+    try {
+      const { data: organized, error: error1 } = await supabase.from('activities_organized').select('*').order('created_at', { ascending: false });
+      const { data: attended, error: error2 } = await supabase.from('activities_attended').select('*').order('created_at', { ascending: false });
+      const { data: support, error: error3 } = await supabase.from('student_support_activities').select('*').order('created_at', { ascending: false });
+      
+      if (error1 || error2 || error3) {
+        throw new Error(error1?.message || error2?.message || error3?.message || "Database error");
+      }
+
+      if (organized) setOrganizedEntries(organized);
+      if (attended) setAttendedEntries(attended);
+      if (support) setSupportEntries(support);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -39,8 +50,17 @@ export default function ActivitiesPage() {
           <h2 className="text-4xl font-extrabold text-[#800000]">Academic Activities</h2>
           <p className="text-gray-500 mt-2 text-lg">Centralized management of all university audit records.</p>
         </div>
-        {loading && <div className="text-[#B23B25] font-bold animate-pulse">Syncing with Database...</div>}
+        <div className="flex items-center gap-4">
+          {loading && <div className="text-[#B23B25] font-bold animate-pulse">Syncing...</div>}
+        </div>
       </div>
+
+      {error && (
+        <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-xl">
+          <p className="text-red-700 font-bold">Database Error</p>
+          <p className="text-red-600 text-sm">{error}</p>
+        </div>
+      )}
 
       {/* Tabs Navigation */}
       <div className="overflow-x-auto pb-2 -mx-6 px-6 md:mx-0 md:px-0">
@@ -87,7 +107,7 @@ function OrganizedModule({ entries, onRefresh }: any) {
   const [form, setForm] = useState({ convener: "", title: "", agency: "", startDate: "", endDate: "", participants: "", theme: "" });
   const [saving, setSaving] = useState(false);
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
     const { error } = await supabase.from('activities_organized').insert([{
@@ -117,15 +137,15 @@ function OrganizedModule({ entries, onRefresh }: any) {
           <h3 className="text-white font-bold text-xl">New Organized Activity</h3>
         </div>
         <form onSubmit={handleSubmit} className="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-          <FormField label="Convener / Coordinator" value={form.convener} onChange={(v) => setForm({...form, convener: v})} />
-          <FormField label="Programme Title" value={form.title} onChange={(v) => setForm({...form, title: v})} />
-          <FormField label="Sponsoring Agency & Funds" value={form.agency} onChange={(v) => setForm({...form, agency: v})} />
+          <FormField label="Convener / Coordinator" value={form.convener} onChange={(v: string) => setForm({...form, convener: v})} />
+          <FormField label="Programme Title" value={form.title} onChange={(v: string) => setForm({...form, title: v})} />
+          <FormField label="Sponsoring Agency & Funds" value={form.agency} onChange={(v: string) => setForm({...form, agency: v})} />
           <div className="grid grid-cols-2 gap-4">
-             <FormField label="Start Date" type="date" value={form.startDate} onChange={(v) => setForm({...form, startDate: v})} />
-             <FormField label="End Date" type="date" value={form.endDate} onChange={(v) => setForm({...form, endDate: v})} />
+             <FormField label="Start Date" type="date" value={form.startDate} onChange={(v: string) => setForm({...form, startDate: v})} />
+             <FormField label="End Date" type="date" value={form.endDate} onChange={(v: string) => setForm({...form, endDate: v})} />
           </div>
-          <FormField label="Participants" type="number" value={form.participants} onChange={(v) => setForm({...form, participants: v})} />
-          <FormField label="Themes (SDG / AI)" value={form.theme} onChange={(v) => setForm({...form, theme: v})} />
+          <FormField label="Participants" type="number" value={form.participants} onChange={(v: string) => setForm({...form, participants: v})} />
+          <FormField label="Themes (SDG / AI)" value={form.theme} onChange={(v: string) => setForm({...form, theme: v})} />
           <SubmitButton saving={saving} />
         </form>
       </div>
@@ -143,7 +163,7 @@ function AttendedModule({ entries, onRefresh }: any) {
   const [form, setForm] = useState({ teacher: "", title: "", institution: "", startDate: "", endDate: "" });
   const [saving, setSaving] = useState(false);
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
     const { error } = await supabase.from('activities_attended').insert([{
@@ -171,12 +191,12 @@ function AttendedModule({ entries, onRefresh }: any) {
           <h3 className="text-white font-bold text-xl">New Attended Activity</h3>
         </div>
         <form onSubmit={handleSubmit} className="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-          <FormField label="Name of Teacher" value={form.teacher} onChange={(v) => setForm({...form, teacher: v})} />
-          <FormField label="Title of Programme" value={form.title} onChange={(v) => setForm({...form, title: v})} />
-          <FormField label="Organizing Institution" value={form.institution} onChange={(v) => setForm({...form, institution: v})} />
+          <FormField label="Name of Teacher" value={form.teacher} onChange={(v: string) => setForm({...form, teacher: v})} />
+          <FormField label="Title of Programme" value={form.title} onChange={(v: string) => setForm({...form, title: v})} />
+          <FormField label="Organizing Institution" value={form.institution} onChange={(v: string) => setForm({...form, institution: v})} />
           <div className="grid grid-cols-2 gap-4">
-             <FormField label="Start Date" type="date" value={form.startDate} onChange={(v) => setForm({...form, startDate: v})} />
-             <FormField label="End Date" type="date" value={form.endDate} onChange={(v) => setForm({...form, endDate: v})} />
+             <FormField label="Start Date" type="date" value={form.startDate} onChange={(v: string) => setForm({...form, startDate: v})} />
+             <FormField label="End Date" type="date" value={form.endDate} onChange={(v: string) => setForm({...form, endDate: v})} />
           </div>
           <SubmitButton saving={saving} />
         </form>
@@ -195,7 +215,7 @@ function SupportModule({ entries, onRefresh }: any) {
   const [form, setForm] = useState({ activity: "", purpose: "", coordinator: "", funds: "", students: "" });
   const [saving, setSaving] = useState(false);
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
     const { error } = await supabase.from('student_support_activities').insert([{
@@ -223,11 +243,11 @@ function SupportModule({ entries, onRefresh }: any) {
           <h3 className="text-white font-bold text-xl">New Student Support Activity</h3>
         </div>
         <form onSubmit={handleSubmit} className="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-          <FormField label="Name of Activity" value={form.activity} onChange={(v) => setForm({...form, activity: v})} />
-          <FormField label="Purpose" value={form.purpose} onChange={(v) => setForm({...form, purpose: v})} />
-          <FormField label="Programme Coordinator" value={form.coordinator} onChange={(v) => setForm({...form, coordinator: v})} />
-          <FormField label="Funds Utilized" value={form.funds} onChange={(v) => setForm({...form, funds: v})} />
-          <FormField label="Students Engaged" type="number" value={form.students} onChange={(v) => setForm({...form, students: v})} />
+          <FormField label="Name of Activity" value={form.activity} onChange={(v: string) => setForm({...form, activity: v})} />
+          <FormField label="Purpose" value={form.purpose} onChange={(v: string) => setForm({...form, purpose: v})} />
+          <FormField label="Programme Coordinator" value={form.coordinator} onChange={(v: string) => setForm({...form, coordinator: v})} />
+          <FormField label="Funds Utilized" value={form.funds} onChange={(v: string) => setForm({...form, funds: v})} />
+          <FormField label="Students Engaged" type="number" value={form.students} onChange={(v: string) => setForm({...form, students: v})} />
           <SubmitButton saving={saving} />
         </form>
       </div>
@@ -242,7 +262,7 @@ function SupportModule({ entries, onRefresh }: any) {
 
 // --- REUSABLE COMPONENTS ---
 
-function FormField({ label, type = "text", value, onChange, placeholder }: any) {
+function FormField({ label, type = "text", value, onChange, placeholder }: { label: string, type?: string, value: string, onChange: (v: string) => void, placeholder?: string }) {
   return (
     <div className="space-y-2">
       <label className="block text-sm font-bold text-gray-700">{label}</label>
@@ -272,7 +292,7 @@ function SubmitButton({ saving }: { saving: boolean }) {
   );
 }
 
-function Table({ headers, data }: any) {
+function Table({ headers, data }: { headers: string[], data: any[][] }) {
   return (
     <div className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
       <div className="overflow-x-auto">
@@ -285,7 +305,7 @@ function Table({ headers, data }: any) {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {data.map((row: any, i: number) => (
+            {data.map((row: any[], i: number) => (
               <tr key={i} className="hover:bg-[#FFF9E6]/30 transition-colors">
                 {row.map((cell: any, j: number) => (
                   <td key={j} className={`px-8 py-6 text-sm ${j === 0 ? 'font-bold text-gray-900' : 'text-gray-600'}`}>
