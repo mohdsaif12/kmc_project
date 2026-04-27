@@ -21,8 +21,8 @@ export default function Sidebar({ isOpen, setIsOpen }: { isOpen: boolean, setIsO
     >
       <div className="px-6 mb-8 mt-2 flex justify-between items-start">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-primary-container rounded flex items-center justify-center shrink-0">
-            <span className="material-symbols-outlined text-white">account_balance</span>
+          <div className="w-10 h-10 shrink-0">
+            <img src="/kmclu-logo.jpg" alt="KMCLU Logo" className="w-full h-full object-contain" />
           </div>
           <div>
             <h2 className="text-xl font-black text-primary leading-tight">Audit Central</h2>

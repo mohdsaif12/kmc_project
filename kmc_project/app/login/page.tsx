@@ -21,8 +21,8 @@ export default function LoginPage() {
         <div className="absolute -top-10 -right-10 w-32 h-32 bg-[#B23B25]/5 rounded-full blur-2xl"></div>
         
         <div className="text-center space-y-4 relative z-10">
-          <div className="w-20 h-20 bg-[#B23B25] rounded-2xl mx-auto flex items-center justify-center text-white text-3xl font-bold shadow-lg shadow-[#B23B25]/20">
-            U
+          <div className="w-24 h-24 mx-auto flex items-center justify-center relative">
+            <img src="/kmclu-logo.jpg" alt="KMCLU Logo" className="w-full h-full object-contain" />
           </div>
           <h2 className="text-3xl font-extrabold text-[#800000]">Faculty Login</h2>
           <p className="text-gray-500">Access the Academic Audit System</p>
