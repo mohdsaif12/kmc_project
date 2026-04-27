@@ -16,7 +16,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-6 py-12">
-      <div className="max-w-md w-full space-y-8 bg-white p-10 rounded-3xl shadow-2xl border border-gray-100 relative overflow-hidden">
+      <div className="max-w-[448px] w-full space-y-8 bg-white p-10 rounded-3xl shadow-2xl border border-gray-100 relative overflow-hidden">
         {/* Decorative background element */}
         <div className="absolute -top-10 -right-10 w-32 h-32 bg-[#B23B25]/5 rounded-full blur-2xl"></div>
         
