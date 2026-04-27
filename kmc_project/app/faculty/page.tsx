@@ -157,7 +157,34 @@ export default function FacultyProfilePage() {
             </div>
           </div>
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+            {/* Mobile Card View */}
+            <div className="block md:hidden divide-y divide-gray-100">
+              {records.map((record, idx) => (
+                <div key={idx} className="p-4 hover:bg-gray-50 transition-colors">
+                  <div className="flex justify-between items-start mb-2">
+                    <h4 className="font-semibold text-primary text-sm line-clamp-2 pr-2">{record.title}</h4>
+                    <span className="shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full bg-surface-variant text-on-surface-variant uppercase">
+                      {record.category}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center text-xs text-gray-500 mt-2">
+                    <div className="flex items-center gap-1">
+                      <span className="material-symbols-outlined text-[14px]">calendar_today</span>
+                      {record.date ? new Date(record.date).toLocaleDateString() : "N/A"}
+                    </div>
+                    <div className="font-mono text-[10px] bg-gray-100 px-1.5 py-0.5 rounded text-gray-500">
+                      ID: {record.id.substring(0, 8)}
+                    </div>
+                  </div>
+                </div>
+              ))}
+              {!loading && records.length === 0 && (
+                <div className="p-8 text-center text-gray-500">No activities found for this faculty member.</div>
+              )}
+            </div>
+
+            {/* Desktop Table View */}
+            <table className="w-full text-left border-collapse hidden md:table">
               <thead>
                 <tr className="bg-surface-container-low">
                   <th className="px-6 py-4 font-label-caps text-label-caps text-gray-500">DATE</th>

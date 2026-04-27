@@ -296,7 +296,29 @@ function Table({ headers, data }: { headers: string[], data: any[][] }) {
   return (
     <div className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
       <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse">
+        {/* Mobile Card View */}
+        <div className="block md:hidden divide-y divide-gray-100">
+          {data.map((row: any[], i: number) => (
+            <div key={i} className="p-6 hover:bg-[#FFF9E6]/30 transition-colors flex flex-col gap-3">
+              {row.map((cell: any, j: number) => (
+                <div key={j} className="flex flex-col gap-1">
+                  <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{headers[j]}</span>
+                  <span className={`text-sm ${j === 0 ? 'font-bold text-gray-900' : 'text-gray-600'}`}>
+                    {cell === null || cell === "" ? '-' : cell.toString()}
+                  </span>
+                </div>
+              ))}
+            </div>
+          ))}
+          {data.length === 0 && (
+            <div className="p-12 text-center text-gray-400 font-medium italic">
+              No records found. Fill the form above to add your first entry.
+            </div>
+          )}
+        </div>
+
+        {/* Desktop Table View */}
+        <table className="w-full text-left border-collapse hidden md:table">
           <thead>
             <tr className="bg-gray-50 border-b border-gray-200">
               {headers.map((h: string) => (

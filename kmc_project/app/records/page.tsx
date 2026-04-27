@@ -73,7 +73,7 @@ export default function RecordsPage() {
   return (
     <div className="p-lg max-w-full">
       {/* Header Section */}
-      <div className="flex justify-between items-end mb-lg">
+      <div className="flex flex-col sm:flex-row justify-start sm:justify-between items-start sm:items-end gap-4 sm:gap-0 mb-lg">
         <div>
           <h2 className="font-display-lg text-display-lg text-primary">All Records</h2>
           <p className="font-body-md text-gray-600 max-w-[600px] mt-2">
@@ -138,7 +138,40 @@ export default function RecordsPage() {
       {/* Master Table */}
       <div className="bg-white border border-gray-200 overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+          {/* Mobile Card View */}
+          <div className="block md:hidden divide-y divide-gray-100">
+            {records.map((record, idx) => (
+              <div key={idx} className="p-4 hover:bg-gray-50 transition-colors">
+                <div className="flex justify-between items-start mb-2">
+                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border ${
+                    record.type === 'ORGANIZED' ? 'bg-secondary-container/20 text-secondary border-secondary/30' :
+                    record.type === 'ATTENDED' ? 'bg-primary-fixed/20 text-primary border-primary/30' :
+                    'bg-tertiary-container/20 text-tertiary border-tertiary/30'
+                  }`}>
+                    {record.category}
+                  </span>
+                  <button className="text-gray-400 hover:text-primary"><span className="material-symbols-outlined text-sm">more_vert</span></button>
+                </div>
+                <h4 className="font-semibold text-primary mb-1">{record.title || "Untitled"}</h4>
+                <div className="flex flex-col gap-1 text-xs text-gray-600 mt-2">
+                  <div className="flex items-center gap-1">
+                    <span className="material-symbols-outlined text-[14px]">calendar_today</span>
+                    {record.date ? new Date(record.date).toLocaleDateString() : "N/A"}
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <span className="material-symbols-outlined text-[14px]">person</span>
+                    {record.faculty || "Unknown Faculty"}
+                  </div>
+                </div>
+              </div>
+            ))}
+            {!loading && records.length === 0 && (
+              <div className="p-8 text-center text-gray-500">No records found.</div>
+            )}
+          </div>
+
+          {/* Desktop Table View */}
+          <table className="w-full text-left border-collapse hidden md:table">
             <thead>
               <tr className="bg-surface-container-low border-b border-gray-200">
                 <th className="px-md py-sm font-label-caps text-gray-500">TYPE</th>

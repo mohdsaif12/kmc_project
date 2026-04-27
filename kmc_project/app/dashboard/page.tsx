@@ -95,7 +95,7 @@ export default function DashboardPage() {
   return (
     <div className="p-margin max-w-full">
       {/* Welcome Header */}
-      <div className="mb-lg flex justify-between items-end">
+      <div className="mb-lg flex flex-col sm:flex-row justify-start sm:justify-between items-start sm:items-end gap-4 sm:gap-0">
         <div>
           <h2 className="text-display-lg font-display-lg text-on-surface">Auditor Dashboard</h2>
           <p className="text-body-lg font-body-lg text-on-surface-variant mt-2">
@@ -159,7 +159,33 @@ export default function DashboardPage() {
             <a href="/records" className="text-primary text-xs font-semibold hover:underline">View All Activities</a>
           </div>
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+            {/* Mobile Card View */}
+            <div className="block md:hidden divide-y divide-gray-100">
+              {recentActivities.map((activity, idx) => (
+                <div key={idx} className="p-4 hover:bg-gray-50 transition-colors">
+                  <div className="flex justify-between items-start mb-2">
+                    <h4 className="font-semibold text-on-surface text-sm line-clamp-2 pr-2">{activity.title || "Untitled Activity"}</h4>
+                    <span className={`shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${
+                      activity.type === 'ORGANIZED' ? 'bg-red-50 text-red-800' :
+                      activity.type === 'ATTENDED' ? 'bg-blue-50 text-blue-800' :
+                      'bg-gray-100 text-gray-700'
+                    }`}>
+                      {activity.category}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1 text-xs text-gray-500">
+                    <span className="material-symbols-outlined text-[14px]">calendar_today</span>
+                    {activity.date ? new Date(activity.date).toLocaleDateString() : "N/A"}
+                  </div>
+                </div>
+              ))}
+              {!loading && recentActivities.length === 0 && (
+                <div className="p-8 text-center text-gray-500 text-sm">No recent activities found.</div>
+              )}
+            </div>
+
+            {/* Desktop Table View */}
+            <table className="w-full text-left border-collapse hidden md:table">
               <thead>
                 <tr className="bg-surface-container-low">
                   <th className="px-6 py-3 text-label-caps font-label-caps text-gray-500 uppercase tracking-wider">Program Title</th>

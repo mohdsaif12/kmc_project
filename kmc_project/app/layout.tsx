@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Sidebar from "./components/Sidebar";
-import TopBar from "./components/TopBar";
+import ClientLayout from "./components/ClientLayout";
 
 export const metadata: Metadata = {
   title: "Academic Audit Management System",
@@ -20,11 +19,9 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
       </head>
       <body className="min-h-full flex flex-col font-body-md text-on-surface bg-background" suppressHydrationWarning>
-        <Sidebar />
-        <TopBar />
-        <main className="ml-64 pt-16 flex-grow">
+        <ClientLayout>
           {children}
-        </main>
+        </ClientLayout>
       </body>
     </html>
   );
